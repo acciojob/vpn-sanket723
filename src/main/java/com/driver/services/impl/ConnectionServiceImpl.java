@@ -1,6 +1,8 @@
 package com.driver.services.impl;
 
-import com.driver.model.*;
+import com.driver.model.Country;
+import com.driver.model.ServiceProvider;
+import com.driver.model.User;
 import com.driver.repository.ConnectionRepository;
 import com.driver.repository.ServiceProviderRepository;
 import com.driver.repository.UserRepository;
@@ -32,8 +34,33 @@ public class ConnectionServiceImpl implements ConnectionService {
         if(user.getConnected()==true){
             throw new Exception("Already connected");
         }
+        if(user.getCountry().getCountryName().equals(countryName)){
+            return user;
+        }
 
-        return null;
+        List<ServiceProvider> serviceProviderList = user.getServiceProviderList();
+        if(serviceProviderList==null){
+            throw new Exception("Unable to connect");
+        }
+
+        Boolean flag = false;
+        for(ServiceProvider s : serviceProviderList){
+            for(Country c : s.getCountryList()){
+                if(c.getCountryName().equals(countryName)){
+                    user.setConnected(true);
+                    user.setCountry(c);
+                    String maskedIp = c.getCode()+ "." + s.getId() + "." + userId ;
+                    user.setMaskedIp(maskedIp);
+                    flag = true;
+                }
+            }
+        }
+
+        if (flag==false){
+            throw new Exception("Unable to connect");
+        }
+
+        return user;
     }
     @Override
     public User disconnect(int userId) throws Exception {
