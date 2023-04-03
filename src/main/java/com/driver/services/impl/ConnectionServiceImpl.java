@@ -1,9 +1,6 @@
 package com.driver.services.impl;
 
-import com.driver.model.Connection;
-import com.driver.model.Country;
-import com.driver.model.ServiceProvider;
-import com.driver.model.User;
+import com.driver.model.*;
 import com.driver.repository.ConnectionRepository;
 import com.driver.repository.ServiceProviderRepository;
 import com.driver.repository.UserRepository;
@@ -59,12 +56,6 @@ public class ConnectionServiceImpl implements ConnectionService {
                         leastIdServiceProvider = s;
                         countryToSet = c;
                         min = s.getId();
-//                        user.setConnected(true);
-//                        user.setOriginalCountry(c);
-//                        String maskedIp = c.getCode() + "." + s.getId() + "." + userId;
-//                        user.setMaskedIp(maskedIp);
-//                        flag = true;
-//                        min = s.getId();
                     }
                 }
             }
@@ -112,23 +103,63 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         return user;
 
+        //Doubt to ask why not deleting connection from connectionList
 //        List<Connection> connectionList = user.getConnectionList();
 //        for(Connection c : connectionList){
 //            if(c.getUser().equals(user)){
 //                connectionList.remove(c);
 //            }
 //        }
-//
-//        List<ServiceProvider> serviceProviderList = user.getServiceProviderList();
-//        for (ServiceProvider s : serviceProviderList){
-//            if(s.getUsers().contains(user)){
-//                s.getUsers().remove(user);
-//            }
-//        }
 
     }
     @Override
     public User communicate(int senderId, int receiverId) throws Exception {
-        return null;
+        //Establish a connection between sender and receiver users
+        //To communicate to the receiver, sender should be in the current country of the receiver.
+        //If the receiver is connected to a vpn, his current country is the one he is connected to.
+        //If the receiver is not connected to vpn, his current country is his original country.
+        //The sender is initially not connected to any vpn. If the sender's original country does not match receiver's current country, we need to connect the sender to a suitable vpn. If there are multiple options, connect using the service provider having smallest id
+        //If the sender's original country matches receiver's current country, we do not need to do anything as they can communicate. Return the sender as it is.
+        //If communication can not be established due to any reason, throw "Cannot establish communication" exception
+
+        User sender = userRepository2.findById(senderId).get();
+        User receiver = userRepository2.findById(receiverId).get();
+
+        String maskedIp,maskedCountryCode;
+        CountryName receiverCurrentCountryName = null;
+
+        // receiver connected to vpn case
+        if(receiver.getConnected()) {
+            maskedIp = receiver.getMaskedIp();
+            maskedCountryCode = maskedIp.substring(0, 3);
+            if(maskedCountryCode.equals("001")){
+                receiverCurrentCountryName = CountryName.IND;
+            } else if (maskedCountryCode.equals("002")) {
+                receiverCurrentCountryName = CountryName.USA;
+            } else if (maskedCountryCode.equals("003")) {
+                receiverCurrentCountryName = CountryName.AUS;
+            } else if (maskedCountryCode.equals("004")) {
+                receiverCurrentCountryName = CountryName.CHI;
+            }
+            else {
+                receiverCurrentCountryName = CountryName.JPN;
+            }
+
+            if(sender.getOriginalCountry().getCountryName().equals(receiverCurrentCountryName)){
+                return sender;
+            }
+        }
+
+        //receiver not connected to vpn and in same country as sender condition
+        if(!receiver.getConnected()){
+            if(sender.getOriginalCountry().equals(receiver.getOriginalCountry())){
+                return sender;
+            }
+        }
+
+
+        sender = connect(senderId,receiverCurrentCountryName.toString());
+
+        return sender;
     }
 }
