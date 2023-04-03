@@ -30,10 +30,11 @@ public class UserServiceImpl implements UserService {
         user.setUsername(username);
         user.setPassword(password);
 
-        CountryName countryName1 = CountryName.valueOf(countryName);
         Country country = new Country();
+        CountryName countryName1 = CountryName.valueOf(countryName.toUpperCase());
         country.setCountryName(countryName1);
         country.setCode(countryName1.toCode());
+        country.setUser(user);
 
         user.setOriginalCountry(country);
         String originalIp = country.getCode() + "." + user.getId();
@@ -41,7 +42,9 @@ public class UserServiceImpl implements UserService {
         user.setConnected(false);
         user.setMaskedIp(null);
 
-        return userRepository3.save(user);
+        userRepository3.save(user);
+
+        return user;
     }
 
     @Override

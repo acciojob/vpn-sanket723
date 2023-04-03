@@ -27,7 +27,9 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = new Admin();
         admin.setUsername(username);
         admin.setPassword(password);
-        return adminRepository1.save(admin);
+        adminRepository1.save(admin);
+
+        return admin;
     }
 
     @Override
@@ -35,8 +37,12 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepository1.findById(adminId).get();
         ServiceProvider serviceProvider = new ServiceProvider();
         serviceProvider.setName(providerName);
+        serviceProvider.setAdmin(admin);
+
 
         admin.getServiceProviders().add(serviceProvider);
+
+        adminRepository1.save(admin);
 
         return admin;
     }
@@ -52,7 +58,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         Country country = new Country();
-        CountryName countryName1 = CountryName.valueOf(countryName);
+        CountryName countryName1 = CountryName.valueOf(countryName.toUpperCase());
         country.setCountryName(countryName1);
         country.setCode(countryName1.toCode());
 
@@ -60,6 +66,10 @@ public class AdminServiceImpl implements AdminService {
 
         serviceProvider.getCountryList().add(country);
 
+        country.setServiceProvider(serviceProvider);
+
+
+        serviceProviderRepository1.save(serviceProvider);
 
         return serviceProvider;
 
