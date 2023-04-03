@@ -101,19 +101,23 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         User user = userRepository2.findById(userId).get();
 
-        if(user.getConnected()==false){
+        if(!user.getConnected()){
             throw new Exception("Already disconnected");
         }
 
         //make it disconnected
         user.setConnected(false);
         user.setMaskedIp(null);
-        List<Connection> connectionList = user.getConnectionList();
-        for(Connection c : connectionList){
-            if(c.getUser().equals(user)){
-                connectionList.remove(c);
-            }
-        }
+        userRepository2.save(user);
+
+        return user;
+
+//        List<Connection> connectionList = user.getConnectionList();
+//        for(Connection c : connectionList){
+//            if(c.getUser().equals(user)){
+//                connectionList.remove(c);
+//            }
+//        }
 //
 //        List<ServiceProvider> serviceProviderList = user.getServiceProviderList();
 //        for (ServiceProvider s : serviceProviderList){
@@ -122,9 +126,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 //            }
 //        }
 
-        user = userRepository2.save(user);
-
-        return user;
     }
     @Override
     public User communicate(int senderId, int receiverId) throws Exception {
