@@ -96,7 +96,35 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
     @Override
     public User disconnect(int userId) throws Exception {
-        return null;
+        //If the given user was not connected to a vpn, throw "Already disconnected" exception.
+        //Else, disconnect from vpn, make masked Ip as null, update relevant attributes and return updated user.
+
+        User user = userRepository2.findById(userId).get();
+
+        if(user.getConnected()==false){
+            throw new Exception("Already disconnected");
+        }
+
+        //make it disconnected
+        user.setConnected(false);
+        user.setMaskedIp(null);
+        List<Connection> connectionList = user.getConnectionList();
+        for(Connection c : connectionList){
+            if(c.getUser().equals(user)){
+                connectionList.remove(c);
+            }
+        }
+
+        List<ServiceProvider> serviceProviderList = user.getServiceProviderList();
+        for (ServiceProvider s : serviceProviderList){
+            if(s.getUsers().contains(user)){
+                s.getUsers().remove(user);
+            }
+        }
+
+        user = userRepository2.save(user);
+
+        return user;
     }
     @Override
     public User communicate(int senderId, int receiverId) throws Exception {
