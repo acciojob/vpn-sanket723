@@ -47,14 +47,19 @@ public class ConnectionServiceImpl implements ConnectionService {
         }
 
         Boolean flag = false;
+        ServiceProvider leastIdServiceProvider = null;
+        int min = Integer.MAX_VALUE;
         for(ServiceProvider s : serviceProviderList){
             for(Country c : s.getCountryList()){
                 if(c.getCountryName().toString().equals(countryName.toUpperCase())){
-                    user.setConnected(true);
-                    user.setOriginalCountry(c);
-                    String maskedIp = c.getCode()+ "." + s.getId() + "." + userId ;
-                    user.setMaskedIp(maskedIp);
-                    flag = true;
+                    if(s.getId()<min) {
+                        user.setConnected(true);
+                        user.setOriginalCountry(c);
+                        String maskedIp = c.getCode() + "." + s.getId() + "." + userId;
+                        user.setMaskedIp(maskedIp);
+                        flag = true;
+                        min = s.getId();
+                    }
                 }
             }
         }
