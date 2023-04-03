@@ -36,7 +36,8 @@ public class ConnectionServiceImpl implements ConnectionService {
         if(user.getConnected()==true){
             throw new Exception("Already connected");
         }
-        if(originalCountryNameInString.equals(countryName)){
+
+        if(originalCountryNameInString.equals(countryName.toUpperCase())){
             return user;
         }
 
@@ -48,7 +49,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         Boolean flag = false;
         for(ServiceProvider s : serviceProviderList){
             for(Country c : s.getCountryList()){
-                if(c.getCountryName().toString().equals(countryName)){
+                if(c.getCountryName().toString().equals(countryName.toUpperCase())){
                     user.setConnected(true);
                     user.setOriginalCountry(c);
                     String maskedIp = c.getCode()+ "." + s.getId() + "." + userId ;
