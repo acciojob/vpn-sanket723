@@ -48,17 +48,22 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         Boolean flag = false;
         ServiceProvider leastIdServiceProvider = null;
+        Country countryToSet = null;
         int min = Integer.MAX_VALUE;
         for(ServiceProvider s : serviceProviderList){
             for(Country c : s.getCountryList()){
                 if(c.getCountryName().toString().equals(countryName.toUpperCase())){
-                    if(s.getId()<min) {
-                        user.setConnected(true);
-                        user.setOriginalCountry(c);
-                        String maskedIp = c.getCode() + "." + s.getId() + "." + userId;
-                        user.setMaskedIp(maskedIp);
+                    if(s.getId() < min) {
                         flag = true;
+                        leastIdServiceProvider = s;
+                        countryToSet = c;
                         min = s.getId();
+//                        user.setConnected(true);
+//                        user.setOriginalCountry(c);
+//                        String maskedIp = c.getCode() + "." + s.getId() + "." + userId;
+//                        user.setMaskedIp(maskedIp);
+//                        flag = true;
+//                        min = s.getId();
                     }
                 }
             }
@@ -67,6 +72,10 @@ public class ConnectionServiceImpl implements ConnectionService {
         if (flag==false){
             throw new Exception("Unable to connect");
         }
+
+        String maskedIp = countryToSet.getCode() + "." + leastIdServiceProvider.getId() + "." + userId;
+        user.setMaskedIp(maskedIp);
+        user.setConnected(true);
 
         userRepository2.save(user);
         return user;
