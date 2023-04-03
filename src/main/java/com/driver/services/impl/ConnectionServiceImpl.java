@@ -1,5 +1,6 @@
 package com.driver.services.impl;
 
+import com.driver.model.Connection;
 import com.driver.model.Country;
 import com.driver.model.ServiceProvider;
 import com.driver.model.User;
@@ -73,11 +74,24 @@ public class ConnectionServiceImpl implements ConnectionService {
             throw new Exception("Unable to connect");
         }
 
+        Connection connection = new Connection();
+        connection.setUser(user);
+        connection.setServiceProvider(leastIdServiceProvider);
+
         String maskedIp = countryToSet.getCode() + "." + leastIdServiceProvider.getId() + "." + userId;
         user.setMaskedIp(maskedIp);
         user.setConnected(true);
 
+        List<Connection> connectionList = user.getConnectionList();
+        connectionList.add(connection);
+        user.setConnectionList(connectionList);
+
+        List<Connection> connectionList1 = leastIdServiceProvider.getConnectionList();
+        connectionList1.add(connection);
+        leastIdServiceProvider.setConnectionList(connectionList1);
+
         userRepository2.save(user);
+        serviceProviderRepository2.save(leastIdServiceProvider);
         return user;
     }
     @Override
