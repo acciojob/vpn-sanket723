@@ -141,29 +141,34 @@ public class ConnectionServiceImpl implements ConnectionService {
             } else if (maskedCountryCode.equals("004")) {
                 receiverCurrentCountryName = CountryName.CHI;
             }
-            else {
+            else if (maskedCountryCode.equals("005")) {
                 receiverCurrentCountryName = CountryName.JPN;
             }
 
-            if(sender.getOriginalCountry().getCountryName().equals(receiverCurrentCountryName)){
-                return sender;
-            }
+//            if(sender.getOriginalCountry().getCountryName().equals(receiverCurrentCountryName)){
+//                return sender;
+//            }
         }
 
-        //receiver not connected to vpn and in same country as sender condition
-        if(!receiver.getConnected()){
-            if(sender.getOriginalCountry().equals(receiver.getOriginalCountry())){
-                return sender;
-            }
+        else {
+            receiverCurrentCountryName = receiver.getOriginalCountry().getCountryName();
         }
 
+//        //receiver not connected to vpn and in same country as sender condition
+//        if(!receiver.getConnected()){
+//            if(sender.getOriginalCountry().equals(receiver.getOriginalCountry())){
+//                return sender;
+//            }
+//        }
+
+        User user = null;
         try {
-            sender = connect(senderId, receiverCurrentCountryName.toString());
+            user = connect(senderId, receiverCurrentCountryName.toString());
         }
         catch (Exception e){
             throw new Exception("Cannot establish communication");
         }
 
-        return sender;
+        return user;
     }
 }
