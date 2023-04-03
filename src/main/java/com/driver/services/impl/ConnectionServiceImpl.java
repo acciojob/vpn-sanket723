@@ -31,10 +31,12 @@ public class ConnectionServiceImpl implements ConnectionService {
         //Else, establish the connection where the maskedIp is "updatedCountryCode.serviceProviderId.userId" and return the updated user. If multiple service providers allow you to connect to the country, use the service provider having smallest id.
 
         User user = userRepository2.findById(userId).get();
+        String originalCountryNameInString = user.getOriginalCountry().getCountryName().toString();
+
         if(user.getConnected()==true){
             throw new Exception("Already connected");
         }
-        if(user.getOriginalCountry().getCountryName().equals(countryName)){
+        if(originalCountryNameInString.equals(countryName)){
             return user;
         }
 
@@ -46,7 +48,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         Boolean flag = false;
         for(ServiceProvider s : serviceProviderList){
             for(Country c : s.getCountryList()){
-                if(c.getCountryName().equals(countryName)){
+                if(c.getCountryName().toString().equals(countryName)){
                     user.setConnected(true);
                     user.setOriginalCountry(c);
                     String maskedIp = c.getCode()+ "." + s.getId() + "." + userId ;
@@ -60,6 +62,7 @@ public class ConnectionServiceImpl implements ConnectionService {
             throw new Exception("Unable to connect");
         }
 
+        userRepository2.save(user);
         return user;
     }
     @Override
