@@ -26,6 +26,10 @@ public class UserServiceImpl implements UserService {
         //create a user of given country. The originalIp of the user should be "countryCode.userId" and return the user. Note that right now user is not connected and thus connected would be false and maskedIp would be null
         //Note that the userId is created automatically by the repository layer
 
+        if(!countryName.toUpperCase().equals("IND") && !countryName.toUpperCase().equals("AUS") && !countryName.toUpperCase().equals("USA") && !countryName.toUpperCase().equals("CHI") && !countryName.toUpperCase().equals("JPN") ){
+            throw new Exception("Country not found");
+        }
+
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
@@ -37,12 +41,13 @@ public class UserServiceImpl implements UserService {
         country.setUser(user);
 
         user.setOriginalCountry(country);
+        user = userRepository3.save(user);  // this is to get the userId assigned to user
         String originalIp = country.getCode() + "." + user.getId();
         user.setOriginalIp(originalIp);
         user.setConnected(false);
         user.setMaskedIp(null);
 
-        userRepository3.save(user);
+        user = userRepository3.save(user);
 
         return user;
     }
@@ -56,6 +61,8 @@ public class UserServiceImpl implements UserService {
         ServiceProvider serviceProvider = serviceProviderRepository3.findById(serviceProviderId).get();
 
         user.getServiceProviderList().add(serviceProvider);
+
+        user = userRepository3.save(user);
 
 
         return user;

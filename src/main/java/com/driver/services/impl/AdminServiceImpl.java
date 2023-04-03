@@ -11,6 +11,8 @@ import com.driver.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AdminServiceImpl implements AdminService {
     @Autowired
@@ -63,11 +65,13 @@ public class AdminServiceImpl implements AdminService {
         country.setCode(countryName1.toCode());
 
         ServiceProvider serviceProvider = serviceProviderRepository1.findById(serviceProviderId).get();
-
-        serviceProvider.getCountryList().add(country);
+        List<Country> countryList = serviceProvider.getCountryList();
+        //serviceProvider.getCountryList().add(country);
+        countryList.add(country);
 
         country.setServiceProvider(serviceProvider);
 
+        serviceProvider.setCountryList(countryList);
 
         serviceProviderRepository1.save(serviceProvider);
 
