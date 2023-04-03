@@ -157,8 +157,12 @@ public class ConnectionServiceImpl implements ConnectionService {
             }
         }
 
-
-        sender = connect(senderId,receiverCurrentCountryName.toString());
+        try {
+            sender = connect(senderId, receiverCurrentCountryName.toString());
+        }
+        catch (Exception e){
+            throw new Exception("Cannot establish communication");
+        }
 
         return sender;
     }
