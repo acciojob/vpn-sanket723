@@ -108,12 +108,12 @@ public class ConnectionServiceImpl implements ConnectionService {
         //make it disconnected
         user.setConnected(false);
         user.setMaskedIp(null);
-//        List<Connection> connectionList = user.getConnectionList();
-//        for(Connection c : connectionList){
-//            if(c.getUser().equals(user)){
-//                connectionList.remove(c);
-//            }
-//        }
+        List<Connection> connectionList = user.getConnectionList();
+        for(Connection c : connectionList){
+            if(c.getUser().equals(user)){
+                connectionList.remove(c);
+            }
+        }
 //
 //        List<ServiceProvider> serviceProviderList = user.getServiceProviderList();
 //        for (ServiceProvider s : serviceProviderList){
