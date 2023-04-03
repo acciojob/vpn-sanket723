@@ -11,6 +11,8 @@ import com.driver.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -60,9 +62,16 @@ public class UserServiceImpl implements UserService {
 
         ServiceProvider serviceProvider = serviceProviderRepository3.findById(serviceProviderId).get();
 
-        user.getServiceProviderList().add(serviceProvider);
+        List<ServiceProvider> serviceProviderList = user.getServiceProviderList();
+        List<User> userList = serviceProvider.getUsers();
 
-        user = userRepository3.save(user);
+        serviceProviderList.add(serviceProvider);
+        userList.add(user);
+
+        serviceProvider.setUsers(userList);
+        user.setServiceProviderList(serviceProviderList);
+
+        userRepository3.save(user);
 
 
         return user;
